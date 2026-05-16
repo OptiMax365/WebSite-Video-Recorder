@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Professional Tab Recorder</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#0f172a;
+    color:white;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.container{
+    width:100%;
+    max-width:1000px;
+    background:#1e293b;
+    border-radius:18px;
+    padding:25px;
+    box-shadow:0 0 35px rgba(0,0,0,0.45);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.section-title{
+    margin:15px 0 10px;
+    font-size:18px;
+    opacity:0.9;
+}
+
+video{
+    width:100%;
+    border-radius:14px;
+    background:black;
+    margin-bottom:18px;
+}
+
+.controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    justify-content:center;
+    margin-bottom:20px;
+}
+
+button{
+    padding:12px 18px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:bold;
+    transition:0.2s;
+}
+
+button:hover{
+    transform:scale(1.05);
+}
+
+.share{ background:#22c55e; color:white; }
+.record{ background:#ef4444; color:white; }
+.stop{ background:#f59e0b; color:white; }
+.photo{ background:#3b82f6; color:white; }
+.play{ background:#06b6d4; color:white; }
+.save{ background:#8b5cf6; color:white; }
+
+.status{
+    text-align:center;
+    opacity:0.85;
+    margin-top:10px;
+    font-size:15px;
+}
+
+.saved-files{
+    margin-top:25px;
+}
+
+.saved-item{
+    background:#334155;
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.saved-item a{
+    color:#93c5fd;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+canvas{
+    display:none;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Professional Tab Video Recorder</h1>
+
+    <div class="section-title">Live Shared Tab</div>
+    <video id="preview" autoplay muted playsinline></video>
+
+    <div class="section-title">Recorded Video</div>
+    <video id="recordedVideo" controls></video>
+
+    <div class="controls">
+
+        <button class="share" onclick="shareTab()">
+            Share Tab
+        </button>
+
+        <button class="record" onclick="startRecording()">
+            Start Recording
+        </button>
+
+        <button class="stop" onclick="stopRecording()">
+            Stop Recording
+        </button>
+
+        <button class="play" onclick="playVideo()">
+            Play Video
+        </button>
+
+        <button class="save" onclick="downloadVideo()">
+            Download Video
+        </button>
+
+        <button class="photo" onclick="takeScreenshot()">
+            Take Screenshot
+        </button>
+
+    </div>
+
+    <div class="status" id="status">
+        Ready
+    </div>
+
+    <div class="saved-files" id="savedFiles"></div>
+
+    <canvas id="canvas"></canvas>
+
+</div>
+
+<script>
+
+let stream = null;
+let mediaRecorder = null;
+let recordedChunks = [];
+let recordedBlob = null;
+let recordedURL = null;
+
+const preview = document.getElementById("preview");
+const recordedVideo = document.getElementById("recordedVideo");
+const statusText = document.getElementById("status");
+const savedFiles = document.getElementById("savedFiles");
+
+
+// SHARE TAB
+async function shareTab(){
+
+    try{
+
+        stream = await navigator.mediaDevices.getDisplayMedia({
+
+            video:{
+                displaySurface:"browser"
+            },
+
+            audio:true
+
+        });
+
+        preview.srcObject = stream;
+
+        statusText.innerText = "Tab sharing started.";
+
+    }catch(error){
+
+        alert("Error: " + error.message);
+    }
+}
+
+
+// START RECORDING
+function startRecording(){
+
+    if(!stream){
+
+        alert("Please share a tab first.");
+        return;
+    }
+
+    recordedChunks = [];
+
+    mediaRecorder = new MediaRecorder(stream, {
+
+        mimeType:"video/webm"
+
+    });
+
+    mediaRecorder.ondataavailable = function(event){
+
+        if(event.data.size > 0){
+
+            recordedChunks.push(event.data);
+        }
+    };
+
+    mediaRecorder.onstop = function(){
+
+        // CREATE VIDEO FILE
+        recordedBlob = new Blob(recordedChunks, {
+
+            type:"video/webm"
+
+        });
+
+        // CREATE VIDEO URL
+        recordedURL = URL.createObjectURL(recordedBlob);
+
+        // LOAD INTO VIDEO PLAYER
+        recordedVideo.src = recordedURL;
+
+        recordedVideo.load();
+
+        // SAVE VIDEO LOCALLY IN MEMORY
+        localStorage.setItem(
+            "lastVideoSaved",
+            "true"
+        );
+
+        statusText.innerText =
+            "Recording saved successfully.";
+    };
+
+    mediaRecorder.start();
+
+    statusText.innerText =
+        "Recording started...";
+}
+
+
+// STOP RECORDING
+function stopRecording(){
+
+    if(
+        mediaRecorder &&
+        mediaRecorder.state !== "inactive"
+    ){
+
+        mediaRecorder.stop();
+
+        statusText.innerText =
+            "Stopping recording...";
+
+    }else{
+
+        alert("No active recording.");
+    }
+}
+
+
+// PLAY VIDEO
+function playVideo(){
+
+    if(!recordedURL){
+
+        alert("No recorded video found.");
+        return;
+    }
+
+    recordedVideo.play();
+
+    statusText.innerText =
+        "Playing recorded video.";
+}
+
+
+// DOWNLOAD VIDEO
+function downloadVideo(){
+
+    if(!recordedBlob){
+
+        alert("No recorded video available.");
+        return;
+    }
+
+    const fileName =
+        "recorded-video-" +
+        Date.now() +
+        ".webm";
+
+    const a = document.createElement("a");
+
+    a.href = recordedURL;
+
+    a.download = fileName;
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    document.body.removeChild(a);
+
+    // SHOW DOWNLOAD ITEM
+    const item = document.createElement("div");
+
+    item.className = "saved-item";
+
+    item.innerHTML = `
+        <span>${fileName}</span>
+        <a href="${recordedURL}" download="${fileName}">
+            Download Again
+        </a>
+    `;
+
+    savedFiles.appendChild(item);
+
+    statusText.innerText =
+        "Video downloaded successfully.";
+}
+
+
+// SCREENSHOT
+function takeScreenshot(){
+
+    if(!stream){
+
+        alert("Please share a tab first.");
+        return;
+    }
+
+    const canvas =
+        document.getElementById("canvas");
+
+    const ctx =
+        canvas.getContext("2d");
+
+    canvas.width =
+        preview.videoWidth;
+
+    canvas.height =
+        preview.videoHeight;
+
+    ctx.drawImage(
+        preview,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    canvas.toBlob(function(blob){
+
+        const imageURL =
+            URL.createObjectURL(blob);
+
+        const fileName =
+            "screenshot-" +
+            Date.now() +
+            ".png";
+
+        // DOWNLOAD IMAGE
+        const a =
+            document.createElement("a");
+
+        a.href = imageURL;
+
+        a.download = fileName;
+
+        a.click();
+
+        // SHOW SAVED ITEM
+        const item =
+            document.createElement("div");
+
+        item.className = "saved-item";
+
+        item.innerHTML = `
+            <span>${fileName}</span>
+            <a href="${imageURL}" download="${fileName}">
+                Download Again
+            </a>
+        `;
+
+        savedFiles.appendChild(item);
+
+    }, "image/png");
+
+    statusText.innerText =
+        "Screenshot captured.";
+}
+
+</script>
+
+</body>
+</html>
