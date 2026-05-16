@@ -2,32 +2,58 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+/>
+
 <title>Professional Tab Recorder</title>
 
 <style>
+
+:root{
+    --bg:#0f172a;
+    --card:#1e293b;
+    --card2:#334155;
+    --text:#ffffff;
+    --muted:#cbd5e1;
+    --green:#22c55e;
+    --red:#ef4444;
+    --orange:#f59e0b;
+    --blue:#3b82f6;
+    --cyan:#06b6d4;
+    --purple:#8b5cf6;
+}
 
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial, sans-serif;
+    font-family:Arial,sans-serif;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,
+body{
+    width:100%;
+    min-height:100%;
+    overflow-x:hidden;
+    background:var(--bg);
+    color:var(--text);
 }
 
 body{
-    background:#0f172a;
-    color:white;
-    min-height:100vh;
     display:flex;
     justify-content:center;
-    align-items:center;
+    align-items:flex-start;
     padding:20px;
 }
 
 .container{
     width:100%;
     max-width:1000px;
-    background:#1e293b;
+    background:var(--card);
     border-radius:18px;
     padding:25px;
     box-shadow:0 0 35px rgba(0,0,0,0.45);
@@ -36,19 +62,33 @@ body{
 h1{
     text-align:center;
     margin-bottom:20px;
+    font-size:clamp(24px,4vw,38px);
 }
 
 .section-title{
     margin:15px 0 10px;
     font-size:18px;
     opacity:0.9;
+    font-weight:bold;
 }
 
+/* MAINTAIN NORMAL VIDEO VIEWPORT */
 video{
     width:100%;
+    height:auto;
     border-radius:14px;
-    background:black;
     margin-bottom:18px;
+    object-fit:contain;
+    background:none !important;
+    display:block;
+}
+
+/* REMOVE ANY VIDEO WRAPPER BACKGROUND */
+.video-wrapper{
+    width:100%;
+    background:none !important;
+    padding:0;
+    margin:0;
 }
 
 .controls{
@@ -67,45 +107,132 @@ button{
     font-size:15px;
     font-weight:bold;
     transition:0.2s;
+    color:white;
+    min-height:50px;
 }
 
 button:hover{
-    transform:scale(1.05);
+    transform:scale(1.03);
 }
 
-.share{ background:#22c55e; color:white; }
-.record{ background:#ef4444; color:white; }
-.stop{ background:#f59e0b; color:white; }
-.photo{ background:#3b82f6; color:white; }
-.play{ background:#06b6d4; color:white; }
-.save{ background:#8b5cf6; color:white; }
+button:active{
+    transform:scale(0.98);
+}
+
+button:disabled{
+    opacity:0.5;
+    cursor:not-allowed;
+}
+
+.share{ background:var(--green); }
+.record{ background:var(--red); }
+.stop{ background:var(--orange); }
+.photo{ background:var(--blue); }
+.play{ background:var(--cyan); }
+.save{ background:var(--purple); }
 
 .status{
     text-align:center;
-    opacity:0.85;
+    opacity:0.95;
     margin-top:10px;
     font-size:15px;
+    padding:14px;
+    background:#0b1220;
+    border-radius:12px;
+    line-height:1.5;
 }
 
 .saved-files{
     margin-top:25px;
 }
 
+.saved-title{
+    margin-bottom:12px;
+    font-size:20px;
+    font-weight:bold;
+}
+
 .saved-item{
-    background:#334155;
-    padding:12px;
-    border-radius:10px;
-    margin-bottom:10px;
+    background:var(--card2);
+    padding:14px;
+    border-radius:14px;
+    margin-bottom:12px;
     display:flex;
     justify-content:space-between;
     align-items:center;
     flex-wrap:wrap;
+    gap:12px;
+}
+
+.saved-left{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+    flex:1;
+    min-width:220px;
+}
+
+.saved-name{
+    font-weight:bold;
+    word-break:break-word;
+}
+
+.saved-meta{
+    font-size:13px;
+    color:var(--muted);
+}
+
+.saved-actions{
+    display:flex;
+    flex-wrap:wrap;
     gap:10px;
 }
 
-.saved-item a{
-    color:#93c5fd;
+.saved-actions a,
+.saved-actions button{
     text-decoration:none;
+    padding:10px 14px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+    font-weight:bold;
+    font-size:14px;
+    color:white;
+}
+
+.download-link{
+    background:var(--green);
+}
+
+.open-link{
+    background:var(--cyan);
+}
+
+.delete-btn{
+    background:var(--red);
+}
+
+.info-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-bottom:18px;
+}
+
+.info-box{
+    background:#0b1220;
+    border-radius:14px;
+    padding:16px;
+}
+
+.info-label{
+    font-size:13px;
+    opacity:0.7;
+    margin-bottom:6px;
+}
+
+.info-value{
+    font-size:16px;
     font-weight:bold;
 }
 
@@ -113,53 +240,210 @@ canvas{
     display:none;
 }
 
+/* TABLET */
+@media(max-width:768px){
+
+    body{
+        padding:12px;
+    }
+
+    .container{
+        padding:16px;
+    }
+
+    .controls{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+    }
+
+    button{
+        width:100%;
+    }
+
+    .saved-item{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .saved-actions{
+        width:100%;
+    }
+
+    .saved-actions a,
+    .saved-actions button{
+        flex:1;
+        text-align:center;
+    }
+}
+
+/* MOBILE */
+@media(max-width:520px){
+
+    .controls{
+        grid-template-columns:1fr;
+    }
+
+    h1{
+        font-size:26px;
+    }
+
+    .section-title{
+        font-size:16px;
+    }
+
+    button{
+        font-size:15px;
+    }
+
+    .saved-actions{
+        flex-direction:column;
+    }
+
+    .saved-actions a,
+    .saved-actions button{
+        width:100%;
+    }
+}
+
 </style>
 </head>
+
 <body>
 
 <div class="container">
 
-    <h1>Professional Tab Video Recorder</h1>
+    <h1>
+        Professional Tab Video Recorder
+    </h1>
 
-    <div class="section-title">Live Shared Tab</div>
-    <video id="preview" autoplay muted playsinline></video>
+    <div class="info-grid">
 
-    <div class="section-title">Recorded Video</div>
-    <video id="recordedVideo" controls></video>
+        <div class="info-box">
+            <div class="info-label">
+                Recording Format
+            </div>
+
+            <div class="info-value">
+                MP4 Download
+            </div>
+        </div>
+
+        <div class="info-box">
+            <div class="info-label">
+                Device Support
+            </div>
+
+            <div class="info-value">
+                Desktop / Tablet / Mobile
+            </div>
+        </div>
+
+        <div class="info-box">
+            <div class="info-label">
+                Auto Save History
+            </div>
+
+            <div class="info-value">
+                Enabled
+            </div>
+        </div>
+
+    </div>
+
+    <div class="section-title">
+        Live Shared Tab
+    </div>
+
+    <div class="video-wrapper">
+
+        <video
+            id="preview"
+            autoplay
+            muted
+            playsinline
+        ></video>
+
+    </div>
+
+    <div class="section-title">
+        Recorded Video
+    </div>
+
+    <div class="video-wrapper">
+
+        <video
+            id="recordedVideo"
+            controls
+            playsinline
+        ></video>
+
+    </div>
 
     <div class="controls">
 
-        <button class="share" onclick="shareTab()">
-            Share Tab
+        <button
+            class="share"
+            onclick="shareTab()"
+        >
+            Share Tab / Screen
         </button>
 
-        <button class="record" onclick="startRecording()">
+        <button
+            class="record"
+            id="recordBtn"
+            onclick="startRecording()"
+        >
             Start Recording
         </button>
 
-        <button class="stop" onclick="stopRecording()">
+        <button
+            class="stop"
+            id="stopBtn"
+            onclick="stopRecording()"
+        >
             Stop Recording
         </button>
 
-        <button class="play" onclick="playVideo()">
+        <button
+            class="play"
+            onclick="playVideo()"
+        >
             Play Video
         </button>
 
-        <button class="save" onclick="downloadVideo()">
-            Download Video
+        <button
+            class="save"
+            onclick="downloadVideo()"
+        >
+            Download MP4
         </button>
 
-        <button class="photo" onclick="takeScreenshot()">
+        <button
+            class="photo"
+            onclick="takeScreenshot()"
+        >
             Take Screenshot
         </button>
 
     </div>
 
-    <div class="status" id="status">
+    <div
+        class="status"
+        id="status"
+    >
         Ready
     </div>
 
-    <div class="saved-files" id="savedFiles"></div>
+    <div
+        class="saved-files"
+        id="savedFiles"
+    >
+
+        <div class="saved-title">
+            Saved Files
+        </div>
+
+    </div>
 
     <canvas id="canvas"></canvas>
 
@@ -173,10 +457,121 @@ let recordedChunks = [];
 let recordedBlob = null;
 let recordedURL = null;
 
-const preview = document.getElementById("preview");
-const recordedVideo = document.getElementById("recordedVideo");
-const statusText = document.getElementById("status");
-const savedFiles = document.getElementById("savedFiles");
+let recordingTimer = null;
+let recordingSeconds = 0;
+
+const preview =
+    document.getElementById("preview");
+
+const recordedVideo =
+    document.getElementById("recordedVideo");
+
+const statusText =
+    document.getElementById("status");
+
+const savedFiles =
+    document.getElementById("savedFiles");
+
+const recordBtn =
+    document.getElementById("recordBtn");
+
+const stopBtn =
+    document.getElementById("stopBtn");
+
+
+// LOAD HISTORY
+window.addEventListener(
+    "load",
+    loadSavedHistory
+);
+
+
+// UPDATE STATUS
+function updateStatus(message){
+
+    statusText.innerText = message;
+}
+
+
+// FORMAT SIZE
+function formatBytes(bytes){
+
+    if(bytes === 0) return "0 Bytes";
+
+    const k = 1024;
+
+    const sizes = [
+        "Bytes",
+        "KB",
+        "MB",
+        "GB"
+    ];
+
+    const i =
+        Math.floor(
+            Math.log(bytes) /
+            Math.log(k)
+        );
+
+    return parseFloat(
+        (
+            bytes /
+            Math.pow(k,i)
+        ).toFixed(2)
+    ) + " " + sizes[i];
+}
+
+
+// FORMAT TIMER
+function formatTime(seconds){
+
+    const hrs =
+        Math.floor(seconds / 3600);
+
+    const mins =
+        Math.floor(
+            (seconds % 3600) / 60
+        );
+
+    const secs =
+        seconds % 60;
+
+    return (
+        String(hrs).padStart(2,"0")
+        + ":" +
+        String(mins).padStart(2,"0")
+        + ":" +
+        String(secs).padStart(2,"0")
+    );
+}
+
+
+// START TIMER
+function startTimer(){
+
+    clearInterval(recordingTimer);
+
+    recordingSeconds = 0;
+
+    recordingTimer =
+        setInterval(function(){
+
+            recordingSeconds++;
+
+            updateStatus(
+                "Recording... " +
+                formatTime(recordingSeconds)
+            );
+
+        },1000);
+}
+
+
+// STOP TIMER
+function stopTimer(){
+
+    clearInterval(recordingTimer);
+}
 
 
 // SHARE TAB
@@ -184,23 +579,55 @@ async function shareTab(){
 
     try{
 
-        stream = await navigator.mediaDevices.getDisplayMedia({
+        if(stream){
 
-            video:{
-                displaySurface:"browser"
-            },
+            stopTracks();
+        }
 
-            audio:true
+        stream =
+            await navigator.mediaDevices.getDisplayMedia({
 
-        });
+                video:{
+                    displaySurface:"browser",
+                    frameRate:30
+                },
+
+                audio:true
+
+            });
 
         preview.srcObject = stream;
 
-        statusText.innerText = "Tab sharing started.";
+        stream
+        .getVideoTracks()[0]
+        .addEventListener(
+            "ended",
+            function(){
+
+                updateStatus(
+                    "Screen sharing stopped."
+                );
+
+                if(
+                    mediaRecorder &&
+                    mediaRecorder.state !== "inactive"
+                ){
+                    stopRecording();
+                }
+
+                stopTracks();
+            }
+        );
+
+        updateStatus(
+            "Tab/screen sharing started."
+        );
 
     }catch(error){
 
-        alert("Error: " + error.message);
+        alert(
+            "Error: " + error.message
+        );
     }
 }
 
@@ -210,57 +637,75 @@ function startRecording(){
 
     if(!stream){
 
-        alert("Please share a tab first.");
+        alert(
+            "Please share a tab or screen first."
+        );
+
         return;
     }
 
     recordedChunks = [];
 
-    mediaRecorder = new MediaRecorder(stream, {
+    let mimeType =
+        "video/webm; codecs=vp9";
 
-        mimeType:"video/webm"
+    if(
+        !MediaRecorder.isTypeSupported(mimeType)
+    ){
+        mimeType = "video/webm";
+    }
 
-    });
-
-    mediaRecorder.ondataavailable = function(event){
-
-        if(event.data.size > 0){
-
-            recordedChunks.push(event.data);
-        }
-    };
-
-    mediaRecorder.onstop = function(){
-
-        // CREATE VIDEO FILE
-        recordedBlob = new Blob(recordedChunks, {
-
-            type:"video/webm"
-
+    mediaRecorder =
+        new MediaRecorder(stream,{
+            mimeType
         });
 
-        // CREATE VIDEO URL
-        recordedURL = URL.createObjectURL(recordedBlob);
+    mediaRecorder.ondataavailable =
+        function(event){
 
-        // LOAD INTO VIDEO PLAYER
-        recordedVideo.src = recordedURL;
+            if(event.data.size > 0){
 
-        recordedVideo.load();
+                recordedChunks.push(
+                    event.data
+                );
+            }
+        };
 
-        // SAVE VIDEO LOCALLY IN MEMORY
-        localStorage.setItem(
-            "lastVideoSaved",
-            "true"
-        );
+    mediaRecorder.onstop =
+        function(){
 
-        statusText.innerText =
-            "Recording saved successfully.";
-    };
+            recordedBlob =
+                new Blob(recordedChunks,{
+                    type:"video/webm"
+                });
 
-    mediaRecorder.start();
+            recordedURL =
+                URL.createObjectURL(recordedBlob);
 
-    statusText.innerText =
-        "Recording started...";
+            recordedVideo.src =
+                recordedURL;
+
+            recordedVideo.load();
+
+            stopTimer();
+
+            saveToHistory(
+                "video",
+                recordedURL,
+                recordedBlob.size
+            );
+
+            updateStatus(
+                "Recording saved successfully."
+            );
+        };
+
+    mediaRecorder.start(1000);
+
+    startTimer();
+
+    recordBtn.disabled = true;
+    stopBtn.disabled = false;
 }
 
 
@@ -274,12 +719,18 @@ function stopRecording(){
 
         mediaRecorder.stop();
 
-        statusText.innerText =
-            "Stopping recording...";
+        recordBtn.disabled = false;
+        stopBtn.disabled = true;
+
+        updateStatus(
+            "Stopping recording..."
+        );
 
     }else{
 
-        alert("No active recording.");
+        alert(
+            "No active recording."
+        );
     }
 }
 
@@ -289,34 +740,116 @@ function playVideo(){
 
     if(!recordedURL){
 
-        alert("No recorded video found.");
+        alert(
+            "No recorded video found."
+        );
+
         return;
     }
 
     recordedVideo.play();
 
-    statusText.innerText =
-        "Playing recorded video.";
+    updateStatus(
+        "Playing recorded video."
+    );
 }
 
 
 // DOWNLOAD VIDEO
-function downloadVideo(){
+async function downloadVideo(){
 
     if(!recordedBlob){
 
-        alert("No recorded video available.");
+        alert(
+            "No recorded video available."
+        );
+
         return;
     }
 
     const fileName =
         "recorded-video-" +
         Date.now() +
-        ".webm";
+        ".mp4";
 
-    const a = document.createElement("a");
+    const mp4Blob =
+        new Blob(
+            [recordedBlob],
+            { type:"video/mp4" }
+        );
 
-    a.href = recordedURL;
+    // SAVE AS DIALOG
+    if(
+        "showSaveFilePicker" in window
+    ){
+
+        try{
+
+            const handle =
+                await window.showSaveFilePicker({
+
+                    suggestedName:fileName,
+
+                    types:[
+                        {
+                            description:"MP4 Video",
+                            accept:{
+                                "video/mp4":[".mp4"]
+                            }
+                        }
+                    ]
+                });
+
+            const writable =
+                await handle.createWritable();
+
+            await writable.write(mp4Blob);
+
+            await writable.close();
+
+        }catch(error){
+
+            if(
+                error.name !== "AbortError"
+            ){
+
+                fallbackDownload(
+                    mp4Blob,
+                    fileName
+                );
+            }
+        }
+
+    }else{
+
+        fallbackDownload(
+            mp4Blob,
+            fileName
+        );
+    }
+
+    addSavedItem(
+        fileName,
+        URL.createObjectURL(mp4Blob),
+        mp4Blob.size
+    );
+
+    updateStatus(
+        "MP4 video downloaded successfully."
+    );
+}
+
+
+// FALLBACK DOWNLOAD
+function fallbackDownload(blob,fileName){
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const a =
+        document.createElement("a");
+
+    a.href = url;
 
     a.download = fileName;
 
@@ -325,32 +858,18 @@ function downloadVideo(){
     a.click();
 
     document.body.removeChild(a);
-
-    // SHOW DOWNLOAD ITEM
-    const item = document.createElement("div");
-
-    item.className = "saved-item";
-
-    item.innerHTML = `
-        <span>${fileName}</span>
-        <a href="${recordedURL}" download="${fileName}">
-            Download Again
-        </a>
-    `;
-
-    savedFiles.appendChild(item);
-
-    statusText.innerText =
-        "Video downloaded successfully.";
 }
 
 
 // SCREENSHOT
-function takeScreenshot(){
+async function takeScreenshot(){
 
     if(!stream){
 
-        alert("Please share a tab first.");
+        alert(
+            "Please share a tab first."
+        );
+
         return;
     }
 
@@ -374,46 +893,232 @@ function takeScreenshot(){
         canvas.height
     );
 
-    canvas.toBlob(function(blob){
+    canvas.toBlob(
+        async function(blob){
 
-        const imageURL =
-            URL.createObjectURL(blob);
+            const imageURL =
+                URL.createObjectURL(blob);
 
-        const fileName =
-            "screenshot-" +
-            Date.now() +
-            ".png";
+            const fileName =
+                "screenshot-" +
+                Date.now() +
+                ".png";
 
-        // DOWNLOAD IMAGE
-        const a =
-            document.createElement("a");
+            if(
+                "showSaveFilePicker" in window
+            ){
 
-        a.href = imageURL;
+                try{
 
-        a.download = fileName;
+                    const handle =
+                        await window.showSaveFilePicker({
 
-        a.click();
+                            suggestedName:fileName,
 
-        // SHOW SAVED ITEM
-        const item =
-            document.createElement("div");
+                            types:[
+                                {
+                                    description:"PNG Image",
+                                    accept:{
+                                        "image/png":[".png"]
+                                    }
+                                }
+                            ]
+                        });
 
-        item.className = "saved-item";
+                    const writable =
+                        await handle.createWritable();
 
-        item.innerHTML = `
-            <span>${fileName}</span>
-            <a href="${imageURL}" download="${fileName}">
+                    await writable.write(blob);
+
+                    await writable.close();
+
+                }catch(error){
+
+                    if(
+                        error.name !== "AbortError"
+                    ){
+
+                        fallbackDownload(
+                            blob,
+                            fileName
+                        );
+                    }
+                }
+
+            }else{
+
+                fallbackDownload(
+                    blob,
+                    fileName
+                );
+            }
+
+            addSavedItem(
+                fileName,
+                imageURL,
+                blob.size
+            );
+
+            updateStatus(
+                "Screenshot captured."
+            );
+
+        },
+        "image/png"
+    );
+}
+
+
+// ADD SAVED FILE ITEM
+function addSavedItem(
+    fileName,
+    fileURL,
+    fileSize
+){
+
+    const item =
+        document.createElement("div");
+
+    item.className =
+        "saved-item";
+
+    item.innerHTML = `
+        <div class="saved-left">
+
+            <div class="saved-name">
+                ${fileName}
+            </div>
+
+            <div class="saved-meta">
+                ${formatBytes(fileSize)}
+            </div>
+
+        </div>
+
+        <div class="saved-actions">
+
+            <a
+                class="download-link"
+                href="${fileURL}"
+                download="${fileName}"
+            >
                 Download Again
             </a>
-        `;
 
-        savedFiles.appendChild(item);
+            <a
+                class="open-link"
+                href="${fileURL}"
+                target="_blank"
+            >
+                Open
+            </a>
 
-    }, "image/png");
+            <button
+                class="delete-btn"
+                onclick="this.closest('.saved-item').remove()"
+            >
+                Delete
+            </button>
 
-    statusText.innerText =
-        "Screenshot captured.";
+        </div>
+    `;
+
+    savedFiles.appendChild(item);
 }
+
+
+// SAVE HISTORY
+function saveToHistory(
+    type,
+    url,
+    size
+){
+
+    let history =
+        JSON.parse(
+            localStorage.getItem(
+                "recordingHistory"
+            ) || "[]"
+        );
+
+    history.unshift({
+
+        type,
+        url,
+        size,
+        date:Date.now()
+
+    });
+
+    history = history.slice(0,20);
+
+    localStorage.setItem(
+        "recordingHistory",
+        JSON.stringify(history)
+    );
+}
+
+
+// LOAD HISTORY
+function loadSavedHistory(){
+
+    const history =
+        JSON.parse(
+            localStorage.getItem(
+                "recordingHistory"
+            ) || "[]"
+        );
+
+    history.forEach(function(item){
+
+        const extension =
+            item.type === "video"
+            ? ".mp4"
+            : ".png";
+
+        const fileName =
+            item.type +
+            "-" +
+            item.date +
+            extension;
+
+        addSavedItem(
+            fileName,
+            item.url,
+            item.size
+        );
+    });
+}
+
+
+// STOP STREAMS
+function stopTracks(){
+
+    if(stream){
+
+        stream.getTracks().forEach(
+            track => track.stop()
+        );
+
+        preview.srcObject = null;
+
+        stream = null;
+    }
+}
+
+
+// CLEANUP
+window.addEventListener(
+    "beforeunload",
+    function(){
+
+        stopTracks();
+    }
+);
+
+
+// INITIAL BUTTON STATE
+stopBtn.disabled = true;
 
 </script>
 
